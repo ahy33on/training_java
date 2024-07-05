@@ -56,6 +56,6 @@ public class ImageVO {
 	@Override
 	public String toString() {
 		return "ImageVO [no=" + no + ", title=" + title + ", content=" + content + ", id=" + id + ", writeDate="
-				+ writeDate + ", fileName=" + fileName + ", name=" + name +"]";
+				+ writeDate + ", fileName=" + fileName + ", name=" + name + "]";
 	}
 }

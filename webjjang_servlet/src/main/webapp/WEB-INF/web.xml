@@ -43,5 +43,18 @@
 		<filter-name>sitemesh</filter-name>
 		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
-
+	
+	<!-- 예외, 에러 처리
+	 error-code: 브라우저에서 보이는 에러코드, 서버에서 처리한다.
+	 exception-type: 500 Error의 경우, 포괄적인 Exception을 포함한다.
+	 -->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/WEB-INF/views/error/404_noModule.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/WEB-INF/views/error/500_noModule.jsp</location>
+	</error-page>
+	
 </web-app>

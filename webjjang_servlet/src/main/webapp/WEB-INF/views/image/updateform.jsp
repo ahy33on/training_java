@@ -15,40 +15,33 @@
 <form action="update.do" method="post">
 <h1>[ UPDATE FORM ]</h1>
 <input type="hidden" name="no" value="${vo.no}">
+<input type="hidden" name="id" value="${vo.id}">
 <input type="hidden" name="key" value="${param.key}">
 <input type="hidden" name="word" value="${param.word}">
 <input type="hidden" name="page" value="${param.page}">
 <input type="hidden" name="perPageNum" value="${param.perPageNum}">
-<table class="table">
-	<tr>
-		<th>${vo.no}번</th>
-		<th>${vo.writeDate}</th>
-	</tr>
-	<tr>
-		<tr>
-		<th>제목</th>
-		<td><input class="form-control" name="title" required value="${vo.title}"></td>
-	</tr>
-	<tr>
-		<th>내용</th>
-		<td><textarea class="form-control" cols="100" rows="6" name="content" required>${vo.content}</textarea></td>
-	</tr>
-	<tr>
-		<th>작성자</th>
-		<td><input class="form-control" name="writer" required value="${vo.writer}"></td>
-	</tr>
-	<tr>
-		<th>비밀번호</th>
-		<td><input class="form-control" name="pw" required type="password"></td>
-	</tr>
-	<tr>
-		<td colspan="5" id="update">
-			<button class="btn btn-primary">등록</button>
-			<button class="btn btn-secondary" type="button" onclick="history.back();">취소</button>
-			<button class="btn btn-danger" type="reset">초기화</button>
-		</td>
-	</tr>
-</table>
+
+<br>
+    <div class="row">
+      <div class="col-sm-6">
+        <img src="${vo.fileName}" style="width:100%">
+        <div class="alert alert-danger">
+		  이미지 수정을 원하면 이미지 변경을 이용하시오.
+		</div>
+      </div>
+      <div class="col-sm-6">
+        <input class="form-control" name="title" value="${vo.title}" required>
+	    <hr>
+	    <textarea class="form-control" rows="6" name="content" required>${vo.content}</textarea>
+      </div>
+    </div>
+
+<br>
+
+	<button class="btn btn-primary">적용</button>
+	<button class="btn btn-secondary" type="button" onclick="history.back();">취소</button>
+	<button class="btn btn-danger" type="reset">초기화</button>
+
 </form>
 </div>
 </body>

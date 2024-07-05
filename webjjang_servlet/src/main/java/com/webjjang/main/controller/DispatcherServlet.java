@@ -62,7 +62,8 @@ public class DispatcherServlet extends HttpServlet {
 		
 		int pos=uri.indexOf("/", 1);
 		if(pos==-1) {
-			request.getRequestDispatcher("/WEB-INF/views/error/404.jsp").forward(request, response);
+			request.setAttribute("uri", request.getRequestURI());
+			request.getRequestDispatcher("/WEB-INF/views/error/404_noModule.jsp").forward(request, response);
 			return;
 		}
 				
@@ -88,7 +89,8 @@ public class DispatcherServlet extends HttpServlet {
 			jsp=imgc.execute(request);
 			break;
 		default:
-			request.getRequestDispatcher("/WEB-INF/views/error/404.jsp").forward(request, response);
+			request.setAttribute("uri", request.getRequestURI());
+			request.getRequestDispatcher("/WEB-INF/views/error/404_noModule.jsp").forward(request, response);
 			return;
 		}
 		System.out.println("/WEB-INF/views/"+jsp+".jsp"+"---------------");

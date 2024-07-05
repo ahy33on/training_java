@@ -1,5 +1,6 @@
 package com.webjjang.image.controller;
 
+import java.io.File;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,10 +58,9 @@ public class ImageController {
 					System.out.println("======= IMAGE VIEW ======");
 					// 1. 조회수 1증가(글보기), 2. 일반게시판 글보기 데이터 가져오기 : 글보기, 글수정
 					no=Long.parseLong(request.getParameter("no"));
-					inc=Long.parseLong(request.getParameter("inc"));
-					System.out.println("no: "+no+", inc: "+inc);
+					System.out.println("no: "+no);
 					// 전달 데이터 - 글번호, 조회수 증가 여부(1:증가, 0:증가 안함) : 배열 또는 Map
-					result = Execute.execute(Init.get(uri), new Long[]{no, inc});
+					result = Execute.execute(Init.get(uri), no);
 					//pagination: page, perpagenum, no, replyPage, replyPerPageNum 전달 필요
 //					ReplyPageObject replyPageObject=ReplyPageObject.getInstance(request);
 //					Object replyresult = Execute.execute(Init.get("/imagereply/list.do"), replyPageObject);
@@ -80,6 +80,10 @@ public class ImageController {
 					System.out.println("======= IMAGE WRITE ======");
 			
 					//img: MultipartRequest(request, 저장위치, maxsize, enctype, 중복처리)
+					/*multipartrequest: writeform의 input(file) name에 대하여 하나만 처리할 수 있다.
+					 다시 말해, 여러 파일을 올리고 싶으면 input(file)의 name을 서로 다르게 해야 한다.
+					 이때, getFilesystemName() 처리시에도 변수명을 서로 다르게 처리해야 한다.
+					*/
 					MultipartRequest multi=new MultipartRequest(request, realimgpath, 100*1024*1024, "UTF-8", new DefaultFileRenamePolicy());
 					//데이터 수집: name으로 전달된 데이터 수집
 					String title=multi.getParameter("title");
@@ -106,23 +110,25 @@ public class ImageController {
 					
 					break;
 				case "/image/updateform.do":
-					System.out.println("4-1.일반게시판 글 수정 폼");
+					System.out.println("========IMAGE UPDATE FORM=======");
 					no = Long.parseLong(request.getParameter("no"));
-					result = Execute.execute(Init.get("/image/view.do"), new Long[]{no, 0L});
+					result = Execute.execute(Init.get("/image/view.do"), no);
 					// 게시판 글보기 출력 : ImagePrint
 					request.setAttribute("vo", result);
 					jsp="image/updateform";
 					break;
 				case "/image/update.do":
-					System.out.println("4-2.일반게시판 글 수정 처리");
+					System.out.println("========IMAGE UPDATE=======");
 					
 					no = Long.parseLong(request.getParameter("no"));
 					title=request.getParameter("title");
 					content=request.getParameter("content");
+					id=request.getParameter("id");
 					
 					// 변수 - vo 저장하고 Service
 					vo = new ImageVO();
 					vo.setNo(no);
+					vo.setId(id);
 					vo.setTitle(title);
 					vo.setContent(content);
 					
@@ -138,23 +144,64 @@ public class ImageController {
 					
 					break;
 				case "/image/delete.do":
-					System.out.println("5.일반게시판 글삭제");
+					System.out.println("========IMAGE DELETE=======");
 					// 데이터 수집 - DB에서 실행에 필요한 데이터 - 글번호, 비밀번호 - ImageVO
+					
 					vo = new ImageVO();
 					no = Long.parseLong(request.getParameter("no"));
 					vo.setNo(no);
+					vo.setId(id);
 					
 					
 					// DB 처리
 					Execute.execute(Init.get(uri), vo);
 					System.out.println();
 					System.out.println("***************************");
-					System.out.println("**  " + vo.getNo() + "글이 삭제되었습니다.  **");
+					System.out.println("**"+ vo.getNo() + "번 글이 삭제되었습니다.**");
 					System.out.println("***************************");
 					
 					po=PageObject.getInstance(request);
 					jsp="redirect:list.do?perPageNum="
 							+request.getParameter("perPageNum");
+					
+					//삭제할 파일명 불러오기
+					String dltfileName=request.getParameter("dltfile");
+					
+					File dltfile=new File(request.getServletContext().getRealPath(dltfileName));
+					if(dltfile.exists()) dltfile.delete();
+					
+					session.setAttribute("msg", "이미지 삭제가 완료되었습니다.");
+					
+					break;
+				case "/image/changeimage.do":
+					System.out.println("=======IMAGE CHANGE======");
+					
+					po=PageObject.getInstance(request);
+					
+					multi=new MultipartRequest(request, realimgpath, (100*1024*1024), "UTF-8", new DefaultFileRenamePolicy());
+					fileName=multi.getFilesystemName("changefile");
+					no = Long.parseLong(multi.getParameter("no"));
+					dltfileName=multi.getParameter("dltfile");
+					
+					// 변수 - vo 저장하고 Service
+					vo = new ImageVO();
+					vo.setNo(no);
+					vo.setFileName(imgpath+"/"+fileName);
+					
+					//view_fileName=/upload/image/carlfriedrik.jpg
+					//change_fileName=palissybriefcase4.jpg
+					
+					//페이지 정보 받고 uri에 셋팅
+					jsp="redirect:view.do?no="+no+"&"+po.getPageQuery();
+					
+					// [ImageController] - ImageWriteService - ImageDAO.write(vo)
+					Execute.execute(Init.get(uri), vo);
+					
+					//변경 전 이미지 파일 지우기
+					
+					dltfile=new File(request.getServletContext().getRealPath(dltfileName));
+					if(dltfile.exists()) dltfile.delete();
+					session.setAttribute("msg", "이미지 변경이 완료되었습니다.");
 					
 					break;
 	

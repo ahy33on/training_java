@@ -15,6 +15,7 @@ import com.webjjang.boardreply.service.BoardReplyListService;
 import com.webjjang.boardreply.service.BoardReplyUpdateService;
 import com.webjjang.boardreply.service.BoardReplyWriteService;
 import com.webjjang.image.dao.ImageDAO;
+import com.webjjang.image.service.ImageChangeService;
 import com.webjjang.image.service.ImageDeleteService;
 import com.webjjang.image.service.ImageListService;
 import com.webjjang.image.service.ImageUpdateService;
@@ -77,12 +78,14 @@ public class Init {
 		serviceMap.put("/image/write.do", new ImageWriteService());
 		serviceMap.put("/image/update.do", new ImageUpdateService());
 		serviceMap.put("/image/delete.do", new ImageDeleteService());
+		serviceMap.put("/image/changeimage.do", new ImageChangeService());
 		
 		serviceMap.get("/image/list.do").setDAO(daoMap.get("ImageDAO"));
 		serviceMap.get("/image/view.do").setDAO(daoMap.get("ImageDAO"));
 		serviceMap.get("/image/write.do").setDAO(daoMap.get("ImageDAO"));
 		serviceMap.get("/image/update.do").setDAO(daoMap.get("ImageDAO"));
 		serviceMap.get("/image/delete.do").setDAO(daoMap.get("ImageDAO"));
+		serviceMap.get("/image/changeimage.do").setDAO(daoMap.get("ImageDAO"));
 		
 		
 		System.out.println("Init.static 초기화 블록 마지막 부분 ----------");
