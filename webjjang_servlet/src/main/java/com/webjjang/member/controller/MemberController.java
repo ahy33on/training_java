@@ -1,10 +1,14 @@
 package com.webjjang.member.controller;
 
+import java.io.File;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.webjjang.member.vo.LoginVO;
 import com.webjjang.member.vo.MemberVO;
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.webjjang.main.controller.Init;
 import com.webjjang.util.exe.Execute;
 import com.webjjang.util.page.PageObject;
@@ -18,7 +22,7 @@ public class MemberController {
 			
 			//loginVO의 id 정보를 가져오자.
 			String id=null;
-			LoginVO vo=(LoginVO)session.getAttribute("loginvo");
+			LoginVO vo=(LoginVO)session.getAttribute("login");
 			if(vo!=null)
 				id=vo.getId();
 			
@@ -27,6 +31,13 @@ public class MemberController {
 			String jsp=null;
 			Object result = null;
 			Long no = 0L;
+			
+			String imgpath="/upload/member";
+			String realimgpath=request.getServletContext().getRealPath(imgpath);
+			
+			//realSavePath 폴더 부재시 생성
+			File realPathFile=new File(realimgpath);
+			if(!realPathFile.exists()) realPathFile.mkdirs();			
 			
 			try { // 정상 처리
 			
@@ -61,28 +72,80 @@ public class MemberController {
 					
 					session.setAttribute("msg", "로그인 처리가 완료되었습니다.");
 					break;
+				case "/member/list.do":
+					// [MemberController] - (Execute) - MemberListService - MemberDAO.list()
+					System.out.println("---------member List---------");
+					
+					// DB에서 데이터 가져오기 - 가져온 데이터는 List<MemberVO>
+					PageObject po=PageObject.getInstance(request);
+					//id setting: 관리자 제외를 위해
+					System.out.println(id);
+					po.setAccepter(id);
+					result = Execute.execute(Init.get(uri), po);
+//					// 결과 데이터를 속성으로 세팅
+					request.setAttribute("list", result);
+					// pageObject 담기
+					request.setAttribute("po", po);
+					jsp="member/list";
+					break;
+				case "/member/writeform.do": //회원가입 폼
+					System.out.println("---------member writeform---------");
+					jsp="member/writeform";
+					break;
+				case "/member/write.do":
+					System.out.println("---------member write---------");
+					
+					MultipartRequest multi=new MultipartRequest(request, realimgpath, 100*1024*1024, "UTF-8", new DefaultFileRenamePolicy());
+					
+					id=multi.getParameter("id");
+					pw=multi.getParameter("pw");
+					String name=multi.getParameter("name");
+					String email=multi.getParameter("email");
+					String tel=multi.getParameter("tel");
+					String gender=multi.getParameter("gender");
+					String birth=multi.getParameter("birth");
+					String img=multi.getFilesystemName("img");
+					
+					// 변수 - vo 저장하고 Service
+					MemberVO mvo = new MemberVO();
+					mvo.setId(id);
+					mvo.setPw(pw);
+					mvo.setName(name);
+					mvo.setEmail(email);
+					mvo.setTel(tel);
+					mvo.setGender(gender);
+					mvo.setBirth(birth);
+					if(img!=null&&!(img.equals("")))
+						mvo.setPhoto(imgpath+"/"+img);
+					
+					// [MemberController] - MemberWriteService - MemberDAO.write(vo)
+					Execute.execute(Init.get(uri), mvo);
+					
+					//redirect: -> 자동 페이지 전환(forward로 대신할 수 있다.)
+					//로그인의 경우, main이나 실행하려고 했던 uri로 이동해야 함.
+					jsp="member/loginform";
+					
+					session.setAttribute("msg", "회원가입 처리가 완료되었습니다.");
+					break;
+				case "/member/idCheck.do":
+					System.out.println("---------member id check---------");
+					
+					id=request.getParameter(id);
+					
+					result = Execute.execute(Init.get(uri), id);
+					
+					request.setAttribute("id", result);
+					
+					jsp="member/idCheck";
+					break;
 				case "/member/logout.do":
 					System.out.println("---------member Logout---------");
 					session.removeAttribute("login");
 					session.setAttribute("msg", "로그아웃 처리가 완료되었습니다.");
 					jsp="redirect:/board/list.do";
 					break;
-				case "/member/list.do":
-					// [MemberController] - (Execute) - MemberListService - MemberDAO.list()
-					System.out.println("1.일반게시판 리스트");
-					// DB에서 데이터 가져오기 - 가져온 데이터는 List<MemberVO>
-					PageObject po=PageObject.getInstance(request);
-					result = Execute.execute(Init.get(uri), po);
-//					PageObject 데이터 확인
-					System.out.println("MemberController.execute().pageObject: "+po);
-					// 가져온 데이터 출력하기
-					request.setAttribute("list", result);
-					//pageObject 담기
-					request.setAttribute("po", po);
-					jsp="member/list";
-					break;
 				case "/member/view.do":
-					System.out.println("2.일반게시판 글보기");
+					System.out.println("---------member view---------");
 					// 1. 조회수 1증가(글보기), 2. 일반게시판 글보기 데이터 가져오기 : 글보기, 글수정
 					no = Long.parseLong(request.getParameter("no"));
 					// 전달 데이터 - 글번호, 조회수 증가 여부(1:증가, 0:증가 안함) : 배열 또는 Map
@@ -99,28 +162,19 @@ public class MemberController {
 					jsp="member/view";
 					break;
 				case "/member/updateform.do":
-					System.out.println("4-1.일반게시판 글 수정 폼");
+					System.out.println("---------member update form---------");
 					no = Long.parseLong(request.getParameter("no"));
 					result = Execute.execute(Init.get("/Member/view.do"), new Long[]{no, 0L});
 					// 게시판 글보기 출력 : MemberPrint
 					request.setAttribute("vo", result);
 					jsp="member/updateform";
 					break;
-				case "/Member/update.do":
-					System.out.println("4-2.일반게시판 글 수정 처리");
+				case "/member/update.do":
+					System.out.println("---------member update---------");
 					
 					no = Long.parseLong(request.getParameter("no"));
-//					title=request.getParameter("title");
-//					content=request.getParameter("content");
-//					writer=request.getParameter("writer");
 					pw=request.getParameter("pw");
 					
-					// 변수 - vo 저장하고 Service
-//					vo = new MemberVO();
-//					vo.setNo(no);
-//					vo.setTitle(title);
-//					vo.setContent(content);
-//					vo.setWriter(writer);
 					vo.setPw(pw);
 					
 					//페이지 정보 받고 uri에 셋팅
@@ -133,8 +187,46 @@ public class MemberController {
 					Execute.execute(Init.get(uri), vo);
 					
 					break;
+				case "/member/changeGrade.do":
+					System.out.println("---------member change grade---------");
+					
+					id = request.getParameter("id");
+					Long gradeNo=Long.parseLong(request.getParameter("gradeNo"));
+					
+					mvo=new MemberVO();
+					mvo.setId(id);
+					mvo.setGradeNo(gradeNo);
+					
+					// [MemberController] - MemberWriteService - MemberDAO.write(vo)
+					Execute.execute(Init.get(uri), mvo);
+					
+					session.setAttribute("msg", id+"님의 등급이 "+((gradeNo==1)?"일반회원":"관리자")+"(으)로 변경되었습니다.");
+					
+					po=PageObject.getInstance(request);
+					jsp="redirect:list.do?"+po.getPageQuery();
+					
+					break;
+				case "/member/changeStatus.do":
+					System.out.println("---------member change status---------");
+					
+					id = request.getParameter("id");
+					String status=request.getParameter("status");
+					
+					mvo=new MemberVO();
+					mvo.setId(id);
+					mvo.setStatus(status);
+					
+					// [MemberController] - MemberWriteService - MemberDAO.write(vo)
+					Execute.execute(Init.get(uri), mvo);
+					
+					session.setAttribute("msg", id+"님의 상태가 "+status+"(으)로 변경되었습니다.");
+					
+					po=PageObject.getInstance(request);
+					jsp="redirect:list.do?"+po.getPageQuery();
+					
+					break;
 				case "/member/delete.do":
-					System.out.println("5.일반게시판 글삭제");
+					System.out.println("---------member delete---------");
 					// 데이터 수집 - DB에서 실행에 필요한 데이터 - 글번호, 비밀번호 - MemberVO
 //					vo = new MemberVO();
 					no = Long.parseLong(request.getParameter("no"));
@@ -154,7 +246,7 @@ public class MemberController {
 							+request.getParameter("perPageNum");
 					
 					break;
-	
+				
 				default:
 					System.out.println("####################################");;
 					System.out.println("## 잘못된 메뉴를 선택하셨습니다.          ##");;

@@ -19,7 +19,7 @@
   <!-- Bootstrap 4 + jquery 라이브러리 등록 - CDN 방식 -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -92,6 +92,14 @@
 		    <li class="nav-item ${(module == '/board')?'active':'' }">
 		      <a class="nav-link" href="/board/list.do">일반게시판</a>
 		    </li>
+		    <c:if test="${!empty login&&login.gradeNo==9}">
+		    	<li class="nav-item ${(module == '/member')?'active':'' }">
+			      <a class="nav-link" href="/member/list.do">
+			      <input type="hidden" value="${login.id}" name="id">
+			      회원관리
+			      </a>
+			    </li>
+		    </c:if>
 		  </ul>
 		  <ul class="navbar-nav">
 		  	<c:if test="${ empty login }">
@@ -128,6 +136,16 @@
 			    </li>
 			    <li class="nav-item">
 			      <a class="nav-link" href="/">장바구니</a>
+			    </li>
+			    <li class="nav-item">
+			      <a class="nav-link">
+			      	<c:if test="${empty login.photo}">
+			      		<i class="fa fa-user-circle"></i>
+			      	</c:if>
+			      	<c:if test="${!empty login.photo}">
+			      		<img src="${login.photo}" class="rounded-circle" style="width:25px;height:25px;">
+			      	</c:if>
+			      </a>
 			    </li>
 		    </c:if>
 		  </ul>

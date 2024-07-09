@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.webjjang.ajax.controller.AjaxController;
 import com.webjjang.board.controller.BoardController;
 import com.webjjang.boardreply.controller.BoardReplyController;
 import com.webjjang.image.controller.ImageController;
@@ -25,6 +26,7 @@ web.xml에 등록해야 한다.
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
+	private AjaxController ac=new AjaxController();
 	private MemberController mc=new MemberController();
 	private BoardController bc=new BoardController();
 	private ImageController imgc=new ImageController();
@@ -76,6 +78,9 @@ public class DispatcherServlet extends HttpServlet {
 		String jsp=null;
 		
 		switch(module) {
+		case "/ajax":
+			jsp=ac.execute(request);
+			break;
 		case "/member":
 			jsp=mc.execute(request);
 			break;

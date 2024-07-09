@@ -14,7 +14,7 @@ public class MemberVO {
 	private String status;
 	private String photo;
 	private Long newMsgCnt;
-	private int gradeNo;
+	private Long gradeNo;
 	private String gradeName;
 	
 	public String getId() {
@@ -89,10 +89,10 @@ public class MemberVO {
 	public void setNewMsgCnt(Long newMsgCnt) {
 		this.newMsgCnt = newMsgCnt;
 	}
-	public int getGradeNo() {
+	public Long getGradeNo() {
 		return gradeNo;
 	}
-	public void setGradeNo(int gradeNo) {
+	public void setGradeNo(Long gradeNo) {
 		this.gradeNo = gradeNo;
 	}
 	

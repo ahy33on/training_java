@@ -24,7 +24,12 @@ import com.webjjang.image.service.ImageWriteService;
 import com.webjjang.main.dao.DAO;
 import com.webjjang.main.service.Service;
 import com.webjjang.member.dao.MemberDAO;
+import com.webjjang.member.service.MemberChangeGradeService;
+import com.webjjang.member.service.MemberChangeStatusService;
+import com.webjjang.member.service.MemberIdCheckService;
+import com.webjjang.member.service.MemberListService;
 import com.webjjang.member.service.MemberLoginService;
+import com.webjjang.member.service.MemberWriteService;
 
 public class Init {
 	//uri에 맞는 서비스를 매핑하는 객체
@@ -67,8 +72,18 @@ public class Init {
 		daoMap.put("MemberDAO", new MemberDAO());
 		
 		serviceMap.put("/member/login.do", new MemberLoginService());
+		serviceMap.put("/member/write.do", new MemberWriteService());
+		serviceMap.put("/member/list.do", new MemberListService());
+		serviceMap.put("/member/changeGrade.do", new MemberChangeGradeService());
+		serviceMap.put("/member/changeStatus.do", new MemberChangeStatusService());
+		serviceMap.put("/ajax/idCheck.do", new MemberIdCheckService());
 		
 		serviceMap.get("/member/login.do").setDAO(daoMap.get("MemberDAO"));
+		serviceMap.get("/member/list.do").setDAO(daoMap.get("MemberDAO"));
+		serviceMap.get("/member/write.do").setDAO(daoMap.get("MemberDAO"));
+		serviceMap.get("/member/changeGrade.do").setDAO(daoMap.get("MemberDAO"));
+		serviceMap.get("/member/changeStatus.do").setDAO(daoMap.get("MemberDAO"));
+		serviceMap.get("/ajax/idCheck.do").setDAO(daoMap.get("MemberDAO"));
 		
 		
 		daoMap.put("ImageDAO", new ImageDAO());
