@@ -1,7 +1,5 @@
 package com.webjjang.image.service;
 
-import com.webjjang.board.dao.BoardDAO;
-import com.webjjang.board.vo.BoardVO;
 import com.webjjang.image.dao.ImageDAO;
 import com.webjjang.image.vo.ImageVO;
 import com.webjjang.main.dao.DAO;

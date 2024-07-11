@@ -8,13 +8,13 @@
 
 <head>
 <meta charset="UTF-8">
-<title>BOARD</title>
+<title>NOTICE LIST</title>
 <script type="text/javascript">
 $(function(){
 	$(".dataRow").click(function(){
 		//화면이동: 글 번호
 		let no=$(this).find(".no").text();
-		location="view.do?no="+no+"&inc=1&${po.pageQuery}";
+		location="view.do?no="+no+"&${po.pageQuery}";
 	});
 	
 	//검색 데이터 세팅
@@ -40,7 +40,7 @@ background: #EEE;
 
 <body>
 <div class="container">
-<h1>[ B O A R D ]</h1>
+<h1>[ 공 지 사 항 ]</h1>
 <br>
 
 <form action="list.do" id="searchForm">
@@ -54,7 +54,6 @@ background: #EEE;
 				    <select name="key" id="key" class="form-control">
 	      				<option value="t">제목</option>
 	      				<option value="c">내용</option>
-	      				<option value="w">작성자</option>
 	      			</select>
 	    		</div>
   				<input name="word" value="${po.word}" type="text" class="form-control form-control-xl" placeholder="검색어를 입력하시오">
@@ -88,22 +87,20 @@ background: #EEE;
 	<tr>
 		<th>번호</th>
 		<th>제목</th>
-		<th>작성자</th>
-		<th>작성일</th>
-		<th>조회수</th>
+		<th>시작일</th>
+		<th>종료일</th>
 	</tr>
 	<c:forEach items="${list}" var="vo">
 		<tr class="dataRow">
 			<td class="no">${vo.no}</td>
 			<td>${vo.title}</td>
-			<td>${vo.writer}</td>
-			<td>${vo.writeDate}</td>
-			<td>${vo.hit}</td>
+			<td>${vo.startDate}</td>
+			<td>${vo.endDate}</td>
 		</tr>
 	</c:forEach>
 	<tr>
-		<td colspan="5" id="write">
-			<a href="writeform.do?perPageNum=${po.perPageNum}"><button class="btn btn-primary" type="button">등록</button></a>
+		<td colspan="4" id="write">
+			<a href="writeform.do?perPageNum=${po.perPageNum }"><button class="btn btn-primary float-right" type="button">등록</button></a>
 		</td>
 	</tr>
 </table>

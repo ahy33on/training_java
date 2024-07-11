@@ -4,11 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.webjjang.member.vo.LoginVO;
-import com.webjjang.member.vo.MemberVO;
 import com.webjjang.main.controller.Init;
 import com.webjjang.util.exe.Execute;
-import com.webjjang.util.page.PageObject;
-import com.webjjang.util.page.ReplyPageObject;
 
 // Member Module 에 맞는 메뉴 선택 , 데이터 수집(기능별), 예외 처리
 public class AjaxController {
@@ -26,7 +23,6 @@ public class AjaxController {
 			String uri = request.getRequestURI();
 			String jsp=null;
 			Object result = null;
-			Long no = 0L;
 			
 			try { // 정상 처리
 				// 메뉴 처리 : CRUD DB 처리 - Controller - Service - DAO

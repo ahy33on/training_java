@@ -1,11 +1,14 @@
 package com.webjjang.notice.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.webjjang.notice.vo.NoticeVO;
 import com.webjjang.main.dao.DAO;
 import com.webjjang.util.db.DB;
+import com.webjjang.util.page.PageObject;
 
 public class NoticeDAO extends DAO{
 
@@ -14,7 +17,7 @@ public class NoticeDAO extends DAO{
 	
 	// 1. 리스트 처리
 	// NoticeController - (Execute) - NoticeListService - [NoticeDAO.list()]
-	public List<NoticeVO> list() throws Exception{
+	public List<NoticeVO> list(PageObject po) throws Exception{
 		// 결과를 저장할 수 있는 변수 선언.
 		List<NoticeVO> list = null;
 		
@@ -24,7 +27,15 @@ public class NoticeDAO extends DAO{
 			con = DB.getConnection();
 			// 3. sql - 아래 LIST
 			// 4. 실행 객체 & 데이터 세팅
-			pstmt = con.prepareStatement(LIST);
+			pstmt = con.prepareStatement(getLIST(po));
+			System.out.println(getLIST(po));
+			
+			//검색이 존재하는 경우, 검색데이터 세팅을 위해 idx 세팅이 필요함.
+			int idx=0;
+			idx=getIdx(idx, pstmt, po);
+			pstmt.setLong(++idx, po.getStartRow());
+			pstmt.setLong(++idx, po.getEndRow());
+			
 			// 5. 실행
 			rs = pstmt.executeQuery();
 			// 6. 표시 또는 담기
@@ -39,7 +50,6 @@ public class NoticeDAO extends DAO{
 					vo.setTitle(rs.getString("title"));
 					vo.setStartDate(rs.getString("startDate"));
 					vo.setEndDate(rs.getString("endDate"));
-					vo.setUpdateDate(rs.getString("updateDate"));
 					
 					// vo -> list
 					list.add(vo);
@@ -52,10 +62,34 @@ public class NoticeDAO extends DAO{
 			// 7. 닫기
 			DB.close(con, pstmt, rs);
 		} // end of try ~ catch ~ finally
-		
-		// 결과 데이터를 리턴해 준다.
 		return list;
 	} // end of list()
+	
+	public Long getTotalrow(PageObject pageObject) throws Exception {
+		// 결과를 저장할 수 있는 변수 선언.
+		Long totalrow = null;
+		try {
+			// 1. 드라이버 확인 - DB
+			// 2. 연결
+			con = DB.getConnection();
+			// 3. sql - 아래 LIST
+			// 4. 실행 객체 & 데이터 세팅
+			pstmt = con.prepareStatement(TOTALROW);
+			// 5. 실행
+			rs = pstmt.executeQuery();
+			// 6. 표시 또는 담기
+			if (rs != null && rs.next())
+				totalrow = rs.getLong(1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			// 7. 닫기
+			DB.close(con, pstmt, rs);
+		} // end of try ~ catch ~ finally
+			// 결과 데이터를 리턴해 준다.
+		return totalrow;
+	} // end of getTotalRow()
 	
 	// 2. 글보기 처리
 	// NoticeController - (Execute) - NoticeListService - [NoticeDAO.view()]
@@ -109,6 +143,7 @@ public class NoticeDAO extends DAO{
 			// 3. sql - 아래 LIST
 			// 4. 실행 객체 & 데이터 세팅
 			pstmt = con.prepareStatement(WRITE);
+			//title, content, startDate, endDate
 			pstmt.setString(1, vo.getTitle());
 			pstmt.setString(2, vo.getContent());
 			pstmt.setString(3, vo.getStartDate());
@@ -126,7 +161,6 @@ public class NoticeDAO extends DAO{
 			// 7. 닫기
 			DB.close(con, pstmt);
 		}
-		
 		// 결과 데이터를 리턴해 준다.
 		return result;
 	} // end of increase()
@@ -202,31 +236,59 @@ public class NoticeDAO extends DAO{
 			// 7. 닫기
 			DB.close(con, pstmt);
 		}
-		
+		System.out.println(no+"번 글 삭제가 완료되었습니다.");
 		// 결과 데이터를 리턴해 준다.
 		return result;
 	} // end of delete()
 	
 	
 	// 실행할 쿼리를 정의해 놓은 변수 선언.
-	final String LIST = "select no, title, "
-			+ " to_char(startDate, 'yyyy-mm-dd') startDate, "
-			+ " to_char(endDate, 'yyyy-mm-dd') endDate, "
-			+ " to_char(updateDate, 'yyyy-mm-dd') updateDate "
-			+ " from notice "
-			+ " order by updateDate desc, no desc"; 
+	final String LIST = "select no, title, startdate, enddate"
+			+ " from("
+				+ " select rownum rnum, no, title, startdate, "
+				+ " enddate from("
+					+ "	select no, title, "
+					+ " to_char(startDate, 'yyyy-mm-dd') startDate, "
+					+ " to_char(endDate, 'yyyy-mm-dd') endDate "
+					+ " from notice "; 
+	final String TOTALROW="select count(*) from notice";
+	
+	final String getLIST(PageObject po) {
+		String sql=LIST;
+		String key=po.getKey();
+		String word=po.getWord();
+		if(word!=null && !word.equals("")) {//검색데이터 존재시
+			sql+=" where 1=0 ";
+			if(key.indexOf("t")>-1) sql+="or title like ?";
+			if(key.indexOf("c")>-1) sql+="or content like ?";
+		}
+		sql+=" order by no desc"
+			+ " ) ) where rnum between ? and ?";
+		return sql;
+	}
+	
+	final int getIdx(int idx, PreparedStatement pstmt, PageObject po) throws SQLException {
+		String key=po.getKey();
+		String word=po.getWord();
+		if(word!=null&&!word.equals("")) {//검색데이터 존재시
+			if(key.indexOf("t")>-1) pstmt.setString(++idx, "%"+word+"%");
+			if(key.indexOf("c")>-1) pstmt.setString(++idx, "%"+word+"%");
+		}
+		return idx;
+	}
+	
 	final String VIEW= "select no, title, content, "
 			+ " to_char(startDate, 'yyyy-mm-dd') startDate, "
 			+ " to_char(endDate, 'yyyy-mm-dd') endDate, "
-			+ " to_char(updateDate, 'yyyy-mm-dd') writeDate, "
+			+ " to_char(writeDate, 'yyyy-mm-dd') writeDate, "
 			+ " to_char(updateDate, 'yyyy-mm-dd') updateDate "
 			+ " from notice "
 			+ " where no = ?";
 	final String WRITE = "insert into notice "
 			+ " (no, title, content, startDate, endDate) "
 			+ " values(notice_seq.nextval, ?, ?, ?, ?)"; 
-	final String UPDATE= "update notice "
-			+ " set title = ?, content = ?, startDate = ?, endDate = ? "
+	final String UPDATE= "update notice set title = ?, content = ?, "
+			+ " startDate = ?, endDate = ?, updateDate=sysdate "
 			+ " where no = ?"; 
 	final String DELETE= "delete from notice "
 			+ " where no = ?"; 

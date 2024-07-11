@@ -1,7 +1,5 @@
 package com.webjjang.boardreply.service;
 
-import com.webjjang.board.dao.BoardDAO;
-import com.webjjang.board.vo.BoardVO;
 import com.webjjang.boardreply.dao.BoardReplyDAO;
 import com.webjjang.boardreply.vo.BoardReplyVO;
 import com.webjjang.main.dao.DAO;

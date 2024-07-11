@@ -3,7 +3,6 @@ package com.webjjang.boardreply.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.webjjang.board.vo.BoardVO;
 import com.webjjang.boardreply.vo.BoardReplyVO;
 import com.webjjang.main.dao.DAO;
 import com.webjjang.util.db.DB;

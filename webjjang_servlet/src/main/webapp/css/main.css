@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+/* img게시판: 말 줄임표 */
+.card:hover{
+	cursor: pointer;
+	background: #EEE;
+}
+.imgdiv{
+	display: flex;
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    overflow: hidden; /* 넘치는 부분 숨김 */
+}
+.card-text{
+	display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2; /* 표시할 최대 줄 수 */
+}
+
+/* 일반 게시판 style */
+.boardlink:hover{
+	cursor: pointer;
+	background: #EEE;
+}
+
+/* 일반게시판과 공지사항 사이에 margin */
+.module{
+	padding: 15px 15px;
+}

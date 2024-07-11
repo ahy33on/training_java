@@ -73,6 +73,7 @@
   		</c:if>
   	</li>
 	</c:forEach>
+	
   	<li data-page="${pageObject.endPage + 1 }"  class="page-item">
 	<c:if test="${pageObject.endPage < pageObject.totalPage }">
   		<a href="${listURI }?page=${pageObject.endPage + 1 }&${pageObject.notPageQuery}${query}"

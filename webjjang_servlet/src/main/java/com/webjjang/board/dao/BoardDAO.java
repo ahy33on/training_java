@@ -68,33 +68,33 @@ public class BoardDAO extends DAO{
 	
 	// 1-2. 전체 데이터 개수 가져오기
 			// BoardController - (Execute) - BoardListService - [BoardDAO.view()]
-			public Long getTotalrow(PageObject pageObject) throws Exception{
-				// 결과를 저장할 수 있는 변수 선언.
-				Long totalrow=null;
-				try {
-					// 1. 드라이버 확인 - DB
-					// 2. 연결
-					con = DB.getConnection();
-					// 3. sql - 아래 LIST
-					// 4. 실행 객체 & 데이터 세팅
-					pstmt = con.prepareStatement(TOTALROW+getSearch(pageObject));
-					int idx=0;
-					setSearchData(pageObject, pstmt, idx);
-					// 5. 실행
-					rs = pstmt.executeQuery();
-					// 6. 표시 또는 담기
-					if(rs != null && rs.next())
-						totalrow=rs.getLong(1);
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw e;
-				} finally {
-					// 7. 닫기
-					DB.close(con, pstmt, rs);
-				} // end of try ~ catch ~ finally
-				// 결과 데이터를 리턴해 준다.
-				return totalrow;
-			} // end of view()
+	public Long getTotalrow(PageObject pageObject) throws Exception {
+		// 결과를 저장할 수 있는 변수 선언.
+		Long totalrow = null;
+		try {
+			// 1. 드라이버 확인 - DB
+			// 2. 연결
+			con = DB.getConnection();
+			// 3. sql - 아래 LIST
+			// 4. 실행 객체 & 데이터 세팅
+			pstmt = con.prepareStatement(TOTALROW + getSearch(pageObject));
+			int idx = 0;
+			setSearchData(pageObject, pstmt, idx);
+			// 5. 실행
+			rs = pstmt.executeQuery();
+			// 6. 표시 또는 담기
+			if (rs != null && rs.next())
+				totalrow = rs.getLong(1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			// 7. 닫기
+			DB.close(con, pstmt, rs);
+		} // end of try ~ catch ~ finally
+			// 결과 데이터를 리턴해 준다.
+		return totalrow;
+	} // end of view()
 	
 	// 2-1. 글보기 조회수 1증가 처리
 	// BoardController - (Execute) - BoardViewService - [BoardDAO.increase()]

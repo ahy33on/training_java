@@ -318,7 +318,6 @@ public class ImageDAO extends DAO{
 	//list.jsp에서 검색시 처리해야 할 기능
 	private String getListSQL(PageObject po) {
 		String sql=LIST;
-		String word=po.getWord();
 		sql+=getSearch(po, false);
 		sql+=" and i.id = m.id order by no desc"
 			+" ) "

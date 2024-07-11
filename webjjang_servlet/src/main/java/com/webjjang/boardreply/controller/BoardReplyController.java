@@ -17,9 +17,7 @@ public class BoardReplyController {
 		// 메뉴 입력
 			String uri = request.getRequestURI();
 			String jsp=null;
-			Object result = null;
 			Long no = 0L;
-			long inc = 0L;
 			
 			try { // 정상 처리
 				ReplyPageObject rpo=ReplyPageObject.getInstance(request);

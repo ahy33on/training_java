@@ -3,7 +3,6 @@ package com.webjjang.main.controller;
 import java.io.IOException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +12,7 @@ import com.webjjang.board.controller.BoardController;
 import com.webjjang.boardreply.controller.BoardReplyController;
 import com.webjjang.image.controller.ImageController;
 import com.webjjang.member.controller.MemberController;
+import com.webjjang.notice.controller.NoticeController;
 
 /**
  * Servlet implementation class DispatcherServlet
@@ -26,7 +26,9 @@ web.xml에 등록해야 한다.
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
+	private NoticeController nc=new NoticeController();
 	private AjaxController ac=new AjaxController();
+	private MainController mainctrl=new MainController();
 	private MemberController mc=new MemberController();
 	private BoardController bc=new BoardController();
 	private ImageController imgc=new ImageController();
@@ -59,8 +61,14 @@ public class DispatcherServlet extends HttpServlet {
 	 */
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
 		String uri=request.getRequestURI();
 		System.out.println("uri: "+uri);
+		
+		if(uri.equals("/")||uri.equals("/main.do")) {
+			response.sendRedirect("/main/main.do");
+			return;
+		}
 		
 		int pos=uri.indexOf("/", 1);
 		if(pos==-1) {
@@ -84,6 +92,9 @@ public class DispatcherServlet extends HttpServlet {
 		case "/member":
 			jsp=mc.execute(request);
 			break;
+		case "/main":
+			jsp=mainctrl.execute(request);
+			break;
 		case "/board":
 			jsp=bc.execute(request);
 			break;
@@ -92,6 +103,9 @@ public class DispatcherServlet extends HttpServlet {
 			break;
 		case "/image":
 			jsp=imgc.execute(request);
+			break;
+		case "/notice":
+			jsp=nc.execute(request);
 			break;
 		default:
 			request.setAttribute("uri", request.getRequestURI());

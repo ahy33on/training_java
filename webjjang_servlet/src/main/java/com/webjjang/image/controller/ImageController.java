@@ -1,7 +1,6 @@
 package com.webjjang.image.controller;
 
 import java.io.File;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -9,12 +8,10 @@ import javax.servlet.http.HttpSession;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.webjjang.image.vo.ImageVO;
-import com.webjjang.main.controller.DispatcherServlet;
 import com.webjjang.main.controller.Init;
 import com.webjjang.member.vo.LoginVO;
 import com.webjjang.util.exe.Execute;
 import com.webjjang.util.page.PageObject;
-import com.webjjang.util.page.ReplyPageObject;
 
 // Image Module 에 맞는 메뉴 선택 , 데이터 수집(기능별), 예외 처리
 public class ImageController {
@@ -24,7 +21,6 @@ public class ImageController {
 			String jsp=null;
 			Object result = null;
 			Long no = 0L;
-			long inc = 0L;
 			
 			HttpSession session=request.getSession();
 			LoginVO loginVO=(LoginVO) session.getAttribute("login");
